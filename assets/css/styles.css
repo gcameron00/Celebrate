@@ -36,6 +36,8 @@ a:hover { text-decoration: underline; }
   z-index: 100;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: stretch;
 }
 
 .steps-nav ol {
@@ -47,7 +49,24 @@ a:hover { text-decoration: underline; }
   padding: 0 0.5rem;
   overflow-x: auto;
   scrollbar-width: none;
+  flex: 1;
+  min-width: 0;
 }
+
+.steps-about-link {
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s;
+}
+
+.steps-about-link:hover { color: var(--accent); text-decoration: none; }
 
 .steps-nav ol::-webkit-scrollbar { display: none; }
 
@@ -413,15 +432,6 @@ a:hover { text-decoration: underline; }
 
 .link-row button:hover   { background: var(--accent-dk); }
 .link-row button.copied  { background: var(--success); }
-
-/* ─── Builder about link ──────────────────────────────────── */
-.about-link {
-  display: inline-block;
-  margin-top: 0.6rem;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-.about-link:hover { color: var(--accent); text-decoration: none; }
 
 /* ─── About page ──────────────────────────────────────────── */
 .about {
