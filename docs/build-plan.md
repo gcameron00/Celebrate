@@ -4,115 +4,38 @@ Sequenced by dependency. Each step should be complete and working before the nex
 
 ---
 
-## 1. Database schema
+## ✓ 1. Database schema
 
-Define what a "celebration" is at the data level. Everything else is built on top of this.
-
-**Decisions to make:**
-- Field list for a celebration record (id, view_id, edit_token_hash, occasion, components JSON, created_at, updated_at)
-- Whether components are stored as a single JSON blob or normalised into rows (blob is simpler to start)
-- Index strategy (view_id is the primary lookup key; edit_token_hash is used for auth)
-
-**Deliverables:**
-- D1 migration SQL file
-- Schema documented in `docs/implementation.md`
+Single `celebrations` table with `view_id`, `edit_token_hash`, `occasion`, `components` JSON blob, timestamps. D1 migration in `migrations/0001_initial.sql`.
 
 ---
 
-## 2. Worker API
+## ✓ 2. Worker API
 
-The HTTP layer between the builder UI and the database. Runs as a Cloudflare Worker.
-
-**Endpoints needed:**
-- `POST /api/celebrations` — create a new celebration, returns view_id + edit_token (plaintext, once only)
-- `GET /api/celebrations/:view_id` — fetch celebration data for the viewer (public)
-- `PATCH /api/celebrations/:view_id` — update a celebration, requires edit_token in header
-- `GET /c/:view_id` — serve the celebration viewer HTML (routing, not data)
-
-**Decisions to make:**
-- How the edit token is passed on update requests (Authorization header vs body)
-- Whether the Worker also serves static assets or Cloudflare Pages handles that
-- Error response shape
-
-**Deliverables:**
-- Worker source in `worker/`
-- `wrangler.toml` config
-- Endpoints documented in `docs/implementation.md`
+Cloudflare Pages Functions in `functions/`. Endpoints: `POST /api/celebrations`, `GET /api/celebrations/:view_id`, `PATCH /api/celebrations/:view_id`. Auth via SHA-256 hashed edit tokens. See `docs/implementation.md` for full detail.
 
 ---
 
-## 3. Builder UI
+## ✓ 3. Builder UI
 
-The creator's experience. A stepped form that collects all the inputs needed to build a celebration, then calls the API.
+Single scrolling page (`index.html`) with sticky step nav. Four sections: Occasion, Who, Message, Look & Feel. Confirmation screen with share link and edit link on success.
 
-**Steps in the flow:**
-1. Choose occasion (preset list + custom text input)
-2. Configure components — toggle which components to include, fill in values for each
-3. Review summary
-4. Create — calls `POST /api/celebrations`, receives back the two URLs
-5. Confirmation screen — shows share link and edit link prominently, explains the edit link must be saved
-
-**Decisions to make:**
-- Whether steps are separate screens or a single scrolling page
-- Validation approach (what's required vs optional)
-- How to handle the photo component at this stage (may be a stub until step 6)
-
-**Deliverables:**
-- Builder UI in `index.html` / `assets/`
-- localStorage handling for the edit token
-
----
-
-## Builder — known issues & future enhancements
-
+**Known issues / future:**
 - Step nav active state doesn't track scroll position correctly — revisit with UI polish
 - Styling and layout pass needed
 - Allow creators to add custom emoji to a theme
 
 ---
 
-## 4. Celebration viewer
+## ✓ 4. Celebration viewer
 
-The recipient's experience. The visual heart of the product — an animated, full-screen celebration page assembled from the stored component data.
-
-**What it needs to do:**
-- Fetch celebration data from `GET /api/celebrations/:view_id`
-- Render each component present in the data (background, emoji theme, name, greeting, note, photo, sender)
-- Animate — the emoji starfield from the birthday site is the baseline; each occasion type may have its own defaults
-- Be mobile-first (iPhone Safari primary target)
-- Degrade gracefully if JS is disabled
-
-**Decisions to make:**
-- Whether the viewer is a separate HTML template or generated dynamically by the Worker
-- Emoji sets per occasion type
-- How photo is displayed if present
-
-**Deliverables:**
-- Viewer template / page
-- Animation system (adapted from birthday site)
-- Component rendering logic
+Served by `functions/c/[view_id].js`. Full HTML page returned from D1 data, celebration data inlined as `window.__C__`. Animated emoji starfield, Great Vibes name typography, Cormorant Garamond greeting.
 
 ---
 
-## 5. Edit token flow
+## ✓ 5. Edit token flow
 
-The UX layer around the creator's ongoing access to their celebration.
-
-**What it needs to do:**
-- On creation, save the edit token to `localStorage` keyed by view_id
-- When a creator visits a share link, check localStorage — if a matching token exists, surface an "Edit" option
-- When an edit link is visited directly (`?edit=<token>`), validate the token and enter edit mode
-- On save, call `PATCH /api/celebrations/:view_id` with the token
-- Make the "you must save this link" message impossible to miss
-
-**Decisions to make:**
-- What "edit mode" looks like — does it reuse the builder UI or is it a lighter inline editor?
-- Whether there's a "delete" option at this stage
-
-**Deliverables:**
-- Token persistence and retrieval logic
-- Edit mode UI
-- Clear messaging about token permanence
+Edit token (UUID) returned once on create, SHA-256 hash stored in DB. Visiting `/c/<view_id>?edit=<token>` verifies the token then redirects to the builder in edit mode. Token persisted to `localStorage`. Viewer shows a subtle Edit button to the creator.
 
 ---
 
@@ -121,10 +44,10 @@ The UX layer around the creator's ongoing access to their celebration.
 Allows the creator to include a photo in their celebration. Stored in Cloudflare R2.
 
 **What it needs to do:**
-- Accept an image file in the builder
-- Upload it to R2 (via a presigned URL or a Worker upload endpoint)
+- Accept an image file in the builder (field is stubbed with "coming soon")
+- Upload to R2 via a Worker upload endpoint
 - Store the R2 object key on the celebration record
-- Serve the image via R2's public URL (or a Worker proxy) to the viewer
+- Serve the image to the viewer
 
 **Decisions to make:**
 - File size and type limits
@@ -140,17 +63,14 @@ Allows the creator to include a photo in their celebration. Stored in Cloudflare
 
 ## Backlog
 
-Items to pick up after the core build is complete.
+### Delete celebration
+No mechanism to delete a celebration yet. Options: add a delete button to edit mode (requires token verification), or a scheduled cleanup of old records. Decision pending.
 
-### Favicon
-- Replace the placeholder `assets/favicon.svg` with a proper mark for the Celebrate brand
+### Styling and layout pass
+The builder and viewer are functional but unstyled beyond basics. A visual polish pass is needed — particularly the step nav, form spacing on mobile, and the confirmation screen.
 
-### OG image
-- **Site-wide**: a static OG image for the home page and about page (used when someone shares the root URL)
-- **Per celebration**: a dynamically generated OG image for each celebration (e.g. includes the recipient's name and occasion), served via a Cloudflare Worker using the Satori or `@vercel/og` approach — or a simpler static fallback image with the celebration title in the meta tags only
+### Custom emoji in themes
+Allow creators to add their own emoji to a theme set, or define a fully custom set.
 
-### "Create your own" link on the celebration viewer
-- A subtle link on every celebration page pointing back to the home page
-- Framing: "Make one for someone you love" or similar — warm, not promotional
-- Placement: below the sender footer, or as a small branded element in a corner
-- Should not distract from the celebration itself
+### Step nav active state
+The step nav does not reliably track which section is in view on scroll. Needs IntersectionObserver tuning or a scroll-position-based approach.

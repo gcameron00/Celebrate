@@ -414,6 +414,15 @@ a:hover { text-decoration: underline; }
 .link-row button:hover   { background: var(--accent-dk); }
 .link-row button.copied  { background: var(--success); }
 
+/* ─── Builder about link ──────────────────────────────────── */
+.about-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.about-link:hover { color: var(--accent); text-decoration: none; }
+
 /* ─── About page ──────────────────────────────────────────── */
 .about {
   max-width: 620px;

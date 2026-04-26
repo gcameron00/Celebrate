@@ -203,3 +203,42 @@ On load, `main.js` reads `?id=` and `?edit=` URL params. If both are present:
 ## Photo upload
 
 _Not yet built._
+
+---
+
+## Favicon
+
+`assets/favicon.svg` — a 32×32 bunting mark: three triangular flags (purple `#5c35b8`, gold `#e8961e`, rose `#d94d7a`) hanging from a twine rope (`#a08060`). Exported as `favicon-32.png` (32×32) and `apple-touch-icon.png` (180×180). All three are referenced in every HTML `<head>`.
+
+---
+
+## OG images
+
+### Static (site-wide)
+
+`assets/og-image.png` (1200×630) — used by the home page and about page. Dark gradient background, 12 bunting flags across the top, "Celebrate" wordmark, tagline. Source SVG at `assets/og-image.svg`.
+
+### Dynamic (per celebration)
+
+`functions/og/c/[view_id].js` — serves a personalised 1200×630 PNG for each celebration at `GET /og/c/:view_id`.
+
+**How it works:**
+
+1. Check Cloudflare Cache API for a cached PNG. Return immediately if found.
+2. Fetch the celebration row from D1.
+3. Initialise `@resvg/resvg-wasm` once per isolate. The WASM binary is bundled via a static `import` from the npm package — it is compiled once at deploy time, so the runtime never calls `WebAssembly.instantiate()` on a raw buffer (which Workers forbid).
+4. Load Great Vibes and Inter fonts from jsDelivr CDN. Font bytes are cached in the Cache API after the first fetch.
+5. Build an SVG: gradient background matched to the celebration's colour scheme, bunting flags, greeting text (Inter, letter-spaced), recipient name (Great Vibes, size scaled to name length), "from sender" line, Celebrate brand mark.
+6. Render SVG → PNG via `resvg.render().asPng()`.
+7. Cache the PNG (1 hour browser / 1 day CDN edge) and return it.
+8. Any error falls back to a `302` redirect to the static OG image.
+
+**Viewer OG tags:**
+
+`functions/c/[view_id].js` includes absolute `og:image` and `twitter:image` URLs pointing to `/og/c/<view_id>`, with `twitter:card: summary_large_image`.
+
+---
+
+## "Create your own" link
+
+Every celebration viewer includes a subtle `<a href="/" class="viewer-create-btn">Celebrate someone →</a>` fixed at the bottom-centre of the page. Injected directly into the viewer HTML by `functions/c/[view_id].js`, styled at very low opacity so it doesn't distract from the celebration.
