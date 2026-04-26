@@ -11,3 +11,9 @@ build/
 
 # Editor settings
 .vscode/
+
+# Wrangler local dev state (local D1 db, cache, etc.)
+.wrangler/
+
+# Local environment variables — never commit secrets
+.dev.vars
