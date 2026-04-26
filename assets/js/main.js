@@ -37,7 +37,12 @@
   const formError      = document.getElementById('form-error');
   const confirmation   = document.getElementById('confirmation');
 
-  if (!form) return; // not on builder page
+  if (!form) return;
+
+  // ─── Edit mode state ──────────────────────────────────────
+  let isEditMode       = false;
+  let editViewId       = null;
+  let editToken        = null;
 
   // ─── State ───────────────────────────────────────────────
   let selectedOccasion = null;
@@ -87,8 +92,6 @@
   }
 
   // ─── Scroll → active section ─────────────────────────────
-  const sectionIds = ['occasion', 'who', 'message', 'look'];
-
   const scrollObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -99,7 +102,7 @@
     });
   }, { rootMargin: '-20% 0px -65% 0px' });
 
-  sectionIds.forEach(id => {
+  ['occasion', 'who', 'message', 'look'].forEach(id => {
     const el = document.getElementById(id);
     if (el) scrollObserver.observe(el);
   });
@@ -110,18 +113,15 @@
       occasionBtns.forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       selectedOccasion = btn.dataset.occasion;
-
       customWrap.hidden = selectedOccasion !== 'custom';
 
       const defaults = OCCASION_DEFAULTS[selectedOccasion];
       if (defaults) {
-        // Only overwrite greeting if it's still a default value or empty
         if (!greetingInput.value.trim() || greetingDefaults.has(greetingInput.value.trim())) {
           greetingInput.value = defaults.greeting;
         }
         buildEmojiGrid(defaults.theme);
       }
-
       updateStepNav();
     });
   });
@@ -131,87 +131,120 @@
     el.addEventListener('input', updateStepNav);
   });
 
-  // ─── Submit ───────────────────────────────────────────────
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    hideError();
-
-    // Resolve occasion value
-    const occasionValue = selectedOccasion === 'custom'
-      ? customInput.value.trim()
-      : selectedOccasion;
-
-    // Validate
-    if (!occasionValue) {
-      showError('Please choose an occasion.');
-      document.getElementById('occasion').scrollIntoView({ behavior: 'smooth', block: 'start' });
-      return;
-    }
-    if (!recipientInput.value.trim()) {
-      showError("Please enter the recipient's name.");
-      recipientInput.focus();
-      return;
-    }
-    if (!senderInput.value.trim()) {
-      showError('Please enter your name.');
-      senderInput.focus();
-      return;
-    }
-    if (!greetingInput.value.trim()) {
-      showError('Please enter a greeting.');
-      greetingInput.focus();
-      return;
-    }
-
-    createBtn.disabled    = true;
-    createBtn.textContent = 'Creating…';
-
-    const selectedTheme  = document.querySelector('input[name="emojiTheme"]:checked')?.value  ?? 'celebration';
-    const selectedScheme = document.querySelector('input[name="background"]:checked')?.value   ?? 'sunset';
-
+  // ─── Build request body from form ─────────────────────────
+  function buildBody(occasionValue) {
     const body = {
       occasion: occasionValue,
       components: {
         recipientName: { value: recipientInput.value.trim() },
         greeting:      { value: greetingInput.value.trim() },
         sender:        { value: senderInput.value.trim() },
-        background:    { scheme: selectedScheme },
-        emojiTheme:    { set: selectedTheme },
+        background:    { scheme: document.querySelector('input[name="background"]:checked')?.value ?? 'sunset' },
+        emojiTheme:    { set:    document.querySelector('input[name="emojiTheme"]:checked')?.value  ?? 'celebration' },
       },
     };
+    if (noteInput.value.trim()) body.components.personalNote = { value: noteInput.value.trim() };
+    return body;
+  }
 
-    if (noteInput.value.trim()) {
-      body.components.personalNote = { value: noteInput.value.trim() };
+  // ─── Submit ───────────────────────────────────────────────
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    hideError();
+
+    const occasionValue = selectedOccasion === 'custom'
+      ? customInput.value.trim()
+      : selectedOccasion;
+
+    if (!occasionValue) {
+      showError('Please choose an occasion.');
+      document.getElementById('occasion').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
     }
+    if (!recipientInput.value.trim()) { showError("Please enter the recipient's name."); recipientInput.focus(); return; }
+    if (!senderInput.value.trim())    { showError('Please enter your name.');            senderInput.focus();    return; }
+    if (!greetingInput.value.trim())  { showError('Please enter a greeting.');           greetingInput.focus();  return; }
+
+    createBtn.disabled    = true;
+    createBtn.textContent = isEditMode ? 'Saving…' : 'Creating…';
 
     try {
-      const res = await fetch('/api/celebrations', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(body),
-      });
-
-      if (!res.ok) throw new Error('server');
-
-      const { view_id, edit_token } = await res.json();
-
-      // Persist edit token locally so returning to the site on this browser auto-unlocks editing
-      try { localStorage.setItem(`celebrate_edit_${view_id}`, edit_token); } catch (_) {}
-
-      showConfirmation(view_id, edit_token, recipientInput.value.trim());
-
+      if (isEditMode) {
+        await saveEdit(occasionValue);
+      } else {
+        await createNew(occasionValue);
+      }
     } catch {
       showError('Something went wrong — please try again.');
       createBtn.disabled    = false;
-      createBtn.textContent = 'Create celebration';
+      createBtn.textContent = isEditMode ? 'Save changes' : 'Create celebration';
     }
   });
 
-  // ─── Confirmation ─────────────────────────────────────────
-  function showConfirmation(viewId, editToken, recipientName) {
+  // ─── Create flow ──────────────────────────────────────────
+  async function createNew(occasionValue) {
+    const res = await fetch('/api/celebrations', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(buildBody(occasionValue)),
+    });
+    if (!res.ok) throw new Error('server');
+
+    const { view_id, edit_token: token } = await res.json();
+    try { localStorage.setItem(`celebrate_edit_${view_id}`, token); } catch (_) {}
+    showCreateConfirmation(view_id, token, recipientInput.value.trim());
+  }
+
+  // ─── Edit / save flow ────────────────────────────────────
+  async function saveEdit(occasionValue) {
+    const res = await fetch(`/api/celebrations/${editViewId}`, {
+      method:  'PATCH',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': `Bearer ${editToken}`,
+      },
+      body: JSON.stringify(buildBody(occasionValue)),
+    });
+    if (!res.ok) throw new Error('server');
+    showSaveConfirmation();
+  }
+
+  // ─── Populate form from existing celebration data ─────────
+  function populateForm(data) {
+    const { occasion, components } = data;
+
+    // Select occasion button (triggers greeting/theme defaults, then we override below)
+    const knownBtn = document.querySelector(`.occasion-btn[data-occasion="${occasion}"]`);
+    if (knownBtn) {
+      knownBtn.click();
+    } else {
+      document.querySelector('.occasion-btn[data-occasion="custom"]')?.click();
+      customInput.value = occasion;
+    }
+
+    // Override with actual saved values
+    if (components.recipientName?.value) recipientInput.value = components.recipientName.value;
+    if (components.sender?.value)        senderInput.value    = components.sender.value;
+    if (components.greeting?.value)      greetingInput.value  = components.greeting.value;
+    if (components.personalNote?.value)  noteInput.value      = components.personalNote.value;
+
+    const scheme = components.background?.scheme;
+    if (scheme) {
+      const radio = document.querySelector(`input[name="background"][value="${scheme}"]`);
+      if (radio) radio.checked = true;
+    }
+
+    const theme = components.emojiTheme?.set;
+    if (theme) buildEmojiGrid(theme);
+
+    updateStepNav();
+  }
+
+  // ─── Confirmations ────────────────────────────────────────
+  function showCreateConfirmation(viewId, token, recipientName) {
     const base     = window.location.origin;
     const shareUrl = `${base}/c/${viewId}`;
-    const editUrl  = `${base}/c/${viewId}?edit=${editToken}`;
+    const editUrl  = `${base}/c/${viewId}?edit=${token}`;
 
     document.getElementById('confirm-recipient').textContent = recipientName;
     document.getElementById('share-link').value = shareUrl;
@@ -224,18 +257,55 @@
     makeCopyButton('copy-edit',  editUrl);
   }
 
+  function showSaveConfirmation() {
+    const viewUrl = `${window.location.origin}/c/${editViewId}`;
+    document.getElementById('confirm-recipient').textContent = recipientInput.value.trim();
+    document.getElementById('share-link').value = viewUrl;
+
+    // Hide the edit link section — creator already has it
+    const editLinkSection = document.getElementById('edit-link')?.closest('.confirm-link');
+    if (editLinkSection) editLinkSection.hidden = true;
+
+    document.querySelector('.confirm-box h1').textContent = 'Changes saved';
+
+    builderWrap.hidden  = true;
+    confirmation.hidden = false;
+
+    makeCopyButton('copy-share', viewUrl);
+  }
+
   function makeCopyButton(btnId, text) {
     const btn = document.getElementById(btnId);
+    if (!btn) return;
     btn.addEventListener('click', () => {
       navigator.clipboard.writeText(text).then(() => {
         btn.textContent = 'Copied!';
         btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = 'Copy';
-          btn.classList.remove('copied');
-        }, 2000);
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
       });
     });
+  }
+
+  // ─── Edit mode init (from URL params) ────────────────────
+  const params = new URLSearchParams(window.location.search);
+  editViewId   = params.get('id');
+  editToken    = params.get('edit');
+
+  if (editViewId && editToken) {
+    isEditMode = true;
+
+    // Persist token to localStorage for this browser
+    try { localStorage.setItem(`celebrate_edit_${editViewId}`, editToken); } catch (_) {}
+
+    // Update UI for edit mode
+    document.querySelector('.builder-header p').textContent = 'Update your celebration.';
+    createBtn.textContent = 'Save changes';
+
+    // Fetch existing data and populate
+    fetch(`/api/celebrations/${editViewId}`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(data => populateForm(data))
+      .catch(() => showError('Could not load celebration data.'));
   }
 
   // ─── Helpers ─────────────────────────────────────────────

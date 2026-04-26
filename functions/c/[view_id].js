@@ -13,7 +13,32 @@ function safeJson(obj) {
     .replace(/<!--/g, '<\\!--');
 }
 
-export async function onRequestGet({ params, env }) {
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf), b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export async function onRequestGet({ params, env, request }) {
+  const url       = new URL(request.url);
+  const editToken = url.searchParams.get('edit');
+
+  // ── Edit mode: verify token, redirect to builder ─────────
+  if (editToken) {
+    const tokenHash = await sha256(editToken);
+    const match = await env.DB.prepare(
+      'SELECT id FROM celebrations WHERE view_id = ? AND edit_token_hash = ?'
+    ).bind(params.view_id, tokenHash).first();
+
+    if (match) {
+      return Response.redirect(
+        `${url.origin}/?id=${params.view_id}&edit=${encodeURIComponent(editToken)}`,
+        302
+      );
+    }
+    // Invalid token — fall through and serve the viewer normally
+  }
+
+  // ── Viewer ────────────────────────────────────────────────
   const row = await env.DB.prepare(
     'SELECT occasion, components FROM celebrations WHERE view_id = ?'
   ).bind(params.view_id).first();
@@ -23,10 +48,10 @@ export async function onRequestGet({ params, env }) {
   }
 
   const components = JSON.parse(row.components);
-  const name     = components.recipientName?.value ?? '';
-  const greeting = components.greeting?.value      ?? '';
-  const sender   = components.sender?.value        ?? '';
-  const note     = components.personalNote?.value  ?? '';
+  const name      = components.recipientName?.value ?? '';
+  const greeting  = components.greeting?.value      ?? '';
+  const sender    = components.sender?.value        ?? '';
+  const note      = components.personalNote?.value  ?? '';
   const pageTitle = [greeting, name].filter(Boolean).join(' ');
 
   const html = `<!doctype html>
@@ -55,7 +80,7 @@ export async function onRequestGet({ params, env }) {
       ${note ? `<p class="note">${escapeHtml(note)}</p>` : ''}
     </main>
     ${sender ? `<footer>from ${escapeHtml(sender)}</footer>` : ''}
-    <script>window.__C__ = ${safeJson({ occasion: row.occasion, components })};</script>
+    <script>window.__C__ = ${safeJson({ viewId: params.view_id, occasion: row.occasion, components })};</script>
     <script src="/assets/js/viewer.js"></script>
   </body>
 </html>`;

@@ -106,6 +106,24 @@ main {
   to   { opacity: 1; transform: translateY(0);    }
 }
 
+/* ─── Edit button (creator only) ─────────────────────────── */
+.viewer-edit-btn {
+  position: fixed;
+  bottom: max(1.2rem, env(safe-area-inset-bottom, 1.2rem));
+  left: 1.4rem;
+  z-index: 20;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(0.75rem, 2.8vw, 1rem);
+  color: rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s;
+  pointer-events: auto;
+}
+
+.viewer-edit-btn:hover { color: rgba(255, 255, 255, 0.85); }
+
 /* ─── Footer ──────────────────────────────────────────────── */
 footer {
   position: fixed;

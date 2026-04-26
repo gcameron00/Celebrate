@@ -157,4 +157,18 @@
     H = window.innerHeight;
   }, { passive: true });
 
+  // ─── Edit button (creator only, via localStorage) ─────────
+  const viewId = celebration.viewId;
+  if (viewId) {
+    let storedToken = null;
+    try { storedToken = localStorage.getItem(`celebrate_edit_${viewId}`); } catch (_) {}
+    if (storedToken) {
+      const editBtn = document.createElement('a');
+      editBtn.href      = `/c/${viewId}?edit=${storedToken}`;
+      editBtn.className = 'viewer-edit-btn';
+      editBtn.textContent = 'Edit';
+      document.body.appendChild(editBtn);
+    }
+  }
+
 })();

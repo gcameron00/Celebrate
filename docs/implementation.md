@@ -176,7 +176,27 @@ User content is HTML-escaped before injection. The inlined JSON is sanitised to 
 
 ## Edit token flow
 
-_Not yet built._
+### How the edit link works
+
+1. Creator visits `/c/<view_id>?edit=<token>`
+2. Pages Function verifies the token hash against the DB
+3. If valid → `302` redirect to `/?id=<view_id>&edit=<token>` (the builder in edit mode)
+4. If invalid → serves the viewer normally (token silently ignored)
+
+### Builder edit mode
+
+On load, `main.js` reads `?id=` and `?edit=` URL params. If both are present:
+- Token is saved to `localStorage` for this browser
+- Existing celebration is fetched from `GET /api/celebrations/:view_id`
+- Form is pre-populated with all saved values
+- Header subtitle changes to "Update your celebration"
+- Submit button changes to "Save changes"
+- On submit, calls `PATCH /api/celebrations/:view_id` with `Authorization: Bearer <token>`
+- Confirmation shows "Changes saved" and hides the edit link section (creator already has it)
+
+### Viewer edit button
+
+`viewer.js` checks `localStorage` for `celebrate_edit_<view_id>`. If a token is found, a subtle "Edit" link appears in the bottom-left of the viewer — visible only to the creator on a browser where they created or edited the celebration. Recipients never see it.
 
 ---
 

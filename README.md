@@ -118,4 +118,4 @@ The birthday site that preceded this project — a bespoke animated page built f
 - [x] Builder UI
 - [x] Celebration viewer
 - [ ] Photo upload (R2)
-- [ ] Edit token flow
+- [x] Edit token flow
