@@ -135,3 +135,22 @@ Allows the creator to include a photo in their celebration. Stored in Cloudflare
 - R2 bucket config in `wrangler.toml`
 - Upload endpoint in Worker
 - Photo component in builder and viewer
+
+---
+
+## Backlog
+
+Items to pick up after the core build is complete.
+
+### Favicon
+- Replace the placeholder `assets/favicon.svg` with a proper mark for the Celebrate brand
+
+### OG image
+- **Site-wide**: a static OG image for the home page and about page (used when someone shares the root URL)
+- **Per celebration**: a dynamically generated OG image for each celebration (e.g. includes the recipient's name and occasion), served via a Cloudflare Worker using the Satori or `@vercel/og` approach — or a simpler static fallback image with the celebration title in the meta tags only
+
+### "Create your own" link on the celebration viewer
+- A subtle link on every celebration page pointing back to the home page
+- Framing: "Make one for someone you love" or similar — warm, not promotional
+- Placement: below the sender footer, or as a small branded element in a corner
+- Should not distract from the celebration itself
