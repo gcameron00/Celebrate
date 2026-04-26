@@ -1,0 +1,126 @@
+/* ─── Reset ───────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+/* ─── Background — default + schemes ─────────────────────── */
+body {
+  background-image: linear-gradient(-45deg, #1a3a5c, #5c1a8f, #c94b2e, #e8961e, #d94d7a, #1a5c5c);
+  background-size: 600% 600%;
+  animation: gradientShift 28s ease infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+}
+
+body.bg-sunset   { background-image: linear-gradient(-45deg, #1a3a5c, #5c1a8f, #c94b2e, #e8961e, #d94d7a, #1a5c5c); }
+body.bg-ocean    { background-image: linear-gradient(-45deg, #0a2a4a, #0e4d6e, #0a3a5a, #1a8fa0, #2ab8c8, #0e4d6e); }
+body.bg-forest   { background-image: linear-gradient(-45deg, #0a2a0a, #1a4a1a, #0a3a0a, #2d6a2d, #4a8c2a, #1a4a1a); }
+body.bg-midnight { background-image: linear-gradient(-45deg, #0d0221, #1a0533, #0d0221, #2d1b69, #4a2c8a, #1a0533); }
+body.bg-rose     { background-image: linear-gradient(-45deg, #2a0a1a, #5c1a3a, #2a0a1a, #a0284a, #c94b6a, #5c1a3a); }
+
+@keyframes gradientShift {
+  0%   { background-position:   0%  50%; }
+  25%  { background-position: 100%   0%; }
+  50%  { background-position: 100% 100%; }
+  75%  { background-position:   0% 100%; }
+  100% { background-position:   0%  50%; }
+}
+
+/* ─── Emoji stage ─────────────────────────────────────────── */
+#stage {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.item {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+  will-change: transform, opacity, font-size;
+  transform-origin: center center;
+}
+
+/* ─── Main content ────────────────────────────────────────── */
+main {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  color: #fff;
+  padding: 1.5rem;
+  text-shadow: 0 2px 30px rgba(0, 0, 0, 0.25);
+}
+
+.greeting {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1rem, 4.5vw, 1.8rem);
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeUp 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards 0.5s;
+}
+
+.name {
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  font-size: clamp(4.5rem, 22vw, 11rem);
+  line-height: 1.05;
+  opacity: 0;
+  animation: fadeUp 2s cubic-bezier(0.22, 1, 0.36, 1) forwards 1.1s;
+  text-shadow:
+    0 2px 6px  rgba(0, 0, 0, 0.2),
+    0 6px 48px rgba(255, 200, 120, 0.45);
+}
+
+.note {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 3vw, 1.3rem);
+  max-width: 480px;
+  margin: 1.5rem auto 0;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fadeUp 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards 1.8s;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+/* ─── Footer ──────────────────────────────────────────────── */
+footer {
+  position: fixed;
+  bottom: max(1.2rem, env(safe-area-inset-bottom, 1.2rem));
+  right: 1.4rem;
+  z-index: 20;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(0.75rem, 2.8vw, 1rem);
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  animation: fadeUp 1.8s cubic-bezier(0.22, 1, 0.36, 1) forwards 2.4s;
+  pointer-events: none;
+  user-select: none;
+}

@@ -116,6 +116,6 @@ The birthday site that preceded this project — a bespoke animated page built f
 - [x] Database schema
 - [x] Worker API (create, read, update)
 - [x] Builder UI
-- [ ] Celebration viewer
+- [x] Celebration viewer
 - [ ] Photo upload (R2)
 - [ ] Edit token flow

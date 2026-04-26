@@ -145,7 +145,32 @@ Single scrolling page (`index.html`) with a sticky step nav at the top.
 
 ## Celebration viewer
 
-_Not yet built._
+Served by `functions/c/[view_id].js` — a Pages Function that fetches the celebration from D1 and returns a complete HTML page. The celebration data is inlined as `window.__C__` so the animation can start immediately without a second API call, and OG meta tags can include the recipient's name.
+
+### What gets rendered
+- Animated gradient background (scheme applied as `body.bg-<scheme>` CSS class)
+- Emoji starfield animation — pool drawn from the chosen theme set
+- Recipient name in script typography (Great Vibes)
+- Greeting in spaced italic caps (Cormorant Garamond)
+- Personal note if present
+- Sender footer if present
+
+### Animation
+Adapted from the birthday site. Emoji spawn from the centre and zoom outward (starfield/perspective illusion). Tapping/clicking anywhere spawns a burst. All themes use the same motion model — no theme-specific behaviours yet.
+
+### Emoji sets
+| Theme key | Emojis |
+|---|---|
+| birthday | 🎂 🎁 🎈 🎉 ⭐ 🥳 🍰 |
+| anniversary | 💍 💐 🥂 ❤️ ✨ 🕯️ 💑 |
+| congratulations | 🏆 🥇 ⭐ 🎊 🌟 🎉 🥂 |
+| farewell | ✈️ 🌍 👋 🌅 🗺️ 🧳 🌐 |
+| get-well | 🌸 🌻 ☀️ 🍵 💪 🌈 🌷 |
+| thank-you | 🙏 💐 ✨ 🌸 ❤️ 🌟 💛 |
+| celebration | 🎊 ✨ 🥳 🌟 🎉 🎈 ⭐ |
+
+### Security
+User content is HTML-escaped before injection. The inlined JSON is sanitised to prevent `</script>` injection.
 
 ---
 
