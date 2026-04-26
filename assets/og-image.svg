@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#1a0535"/>
+      <stop offset="45%"  stop-color="#2d0d5a"/>
+      <stop offset="100%" stop-color="#3d0a20"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Rope -->
+  <line x1="0" y1="90" x2="1200" y2="90"
+        stroke="#a08060" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- 12 flags — 96px wide, 4px gaps, starting at x=2         -->
+  <!-- Colours cycle: purple → gold → rose                       -->
+
+  <!-- Purple: 1, 4, 7, 10 -->
+  <polygon points="2,90 98,90 50,216"      fill="#5c35b8"/>
+  <polygon points="302,90 398,90 350,216"  fill="#5c35b8"/>
+  <polygon points="602,90 698,90 650,216"  fill="#5c35b8"/>
+  <polygon points="902,90 998,90 950,216"  fill="#5c35b8"/>
+
+  <!-- Gold: 2, 5, 8, 11 -->
+  <polygon points="102,90 198,90 150,216"    fill="#e8961e"/>
+  <polygon points="402,90 498,90 450,216"    fill="#e8961e"/>
+  <polygon points="702,90 798,90 750,216"    fill="#e8961e"/>
+  <polygon points="1002,90 1098,90 1050,216" fill="#e8961e"/>
+
+  <!-- Rose: 3, 6, 9, 12 -->
+  <polygon points="202,90 298,90 250,216"    fill="#d94d7a"/>
+  <polygon points="502,90 598,90 550,216"    fill="#d94d7a"/>
+  <polygon points="802,90 898,90 850,216"    fill="#d94d7a"/>
+  <polygon points="1102,90 1198,90 1150,216" fill="#d94d7a"/>
+
+  <!-- Wordmark -->
+  <text x="600" y="410"
+        text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="132"
+        fill="white"
+        opacity="0.95">Celebrate</text>
+
+  <!-- Tagline -->
+  <text x="600" y="478"
+        text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="26"
+        font-style="italic"
+        letter-spacing="1.5"
+        fill="white"
+        opacity="0.5">Create a personal celebration for someone worth it</text>
+
+</svg>
