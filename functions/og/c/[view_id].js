@@ -1,5 +1,5 @@
 import { initWasm, Resvg } from '@resvg/resvg-wasm';
-import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm';
+import resvgWasm from './resvg.wasm';
 
 const FONT_VIBES = 'https://cdn.jsdelivr.net/npm/@fontsource/great-vibes/files/great-vibes-latin-400-normal.woff2';
 const FONT_INTER = 'https://cdn.jsdelivr.net/npm/@fontsource/inter/files/inter-latin-300-normal.woff2';

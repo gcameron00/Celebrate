@@ -9,6 +9,9 @@ node_modules/
 dist/
 build/
 
+# Generated during npm install — copied from node_modules by postinstall
+functions/og/c/resvg.wasm
+
 # Editor settings
 .vscode/
 

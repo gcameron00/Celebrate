@@ -1,6 +1,9 @@
 {
   "name": "celebrate",
   "private": true,
+  "scripts": {
+    "postinstall": "node -e \"const fs=require('fs');fs.copyFileSync('node_modules/@resvg/resvg-wasm/index_bg.wasm','functions/og/c/resvg.wasm')\""
+  },
   "dependencies": {
     "@resvg/resvg-wasm": "^2.6.2"
   }
