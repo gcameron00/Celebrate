@@ -82,6 +82,7 @@ export async function onRequestGet({ params, env, request }) {
       ${note ? `<p class="note">${escapeHtml(note)}</p>` : ''}
     </main>
     ${sender ? `<footer>from ${escapeHtml(sender)}</footer>` : ''}
+    <a href="/" class="viewer-create-btn">Celebrate someone →</a>
     <script>window.__C__ = ${safeJson({ viewId: params.view_id, occasion: row.occasion, components })};</script>
     <script src="/assets/js/viewer.js"></script>
   </body>
