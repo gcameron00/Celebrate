@@ -1,0 +1,8 @@
+name = "celebrate"
+pages_build_output_dir = "."
+compatibility_date = "2026-04-26"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "celebrate-db"
+database_id = "68f0c9db-c069-4ad9-b97a-fc7ce7f764bf"
