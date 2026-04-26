@@ -63,6 +63,14 @@ The creator's experience. A stepped form that collects all the inputs needed to 
 
 ---
 
+## Builder — known issues & future enhancements
+
+- Step nav active state doesn't track scroll position correctly — revisit with UI polish
+- Styling and layout pass needed
+- Allow creators to add custom emoji to a theme
+
+---
+
 ## 4. Celebration viewer
 
 The recipient's experience. The visual heart of the product — an animated, full-screen celebration page assembled from the stored component data.
