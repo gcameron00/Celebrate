@@ -113,7 +113,7 @@ The birthday site that preceded this project — a bespoke animated page built f
 
 - [x] Scaffold deployed to Cloudflare Pages
 - [x] Database schema
-- [ ] Worker API (create, read, update)
+- [x] Worker API (create, read, update)
 - [ ] Builder UI
 - [ ] Celebration viewer
 - [ ] Photo upload (R2)

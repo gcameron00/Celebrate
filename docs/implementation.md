@@ -26,15 +26,73 @@ Binding: `DB` (configured in `wrangler.toml`)
 
 ## Worker API
 
-_Not yet built._
+Implemented as Cloudflare Pages Functions (`functions/` directory). No separate Worker deployment — Functions deploy automatically alongside the Pages site and share the same D1 binding.
 
 ### Endpoints
 
-_To be documented when built._
+| Method | Path | Auth | Purpose |
+|---|---|---|---|
+| POST | `/api/celebrations` | None | Create a celebration |
+| GET | `/api/celebrations/:view_id` | None | Fetch celebration data for the viewer |
+| PATCH | `/api/celebrations/:view_id` | Bearer token | Update a celebration |
 
-### Routing
+### POST `/api/celebrations`
 
-_To be documented when built._
+Request body:
+```json
+{
+  "occasion": "birthday",
+  "components": { }
+}
+```
+
+Response `201`:
+```json
+{
+  "view_id": "abc12345",
+  "edit_token": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+}
+```
+
+`edit_token` is returned **once only** and never stored in plaintext.
+
+### GET `/api/celebrations/:view_id`
+
+Response `200`:
+```json
+{
+  "view_id": "abc12345",
+  "occasion": "birthday",
+  "components": { },
+  "created_at": "2026-04-26 10:00:00",
+  "updated_at": "2026-04-26 10:00:00"
+}
+```
+
+`edit_token_hash` is never returned.
+
+### PATCH `/api/celebrations/:view_id`
+
+Header: `Authorization: Bearer <edit_token>`
+
+Request body (all fields optional — omitted fields are unchanged):
+```json
+{
+  "occasion": "birthday",
+  "components": { }
+}
+```
+
+Response `200`: `{ "ok": true }`  
+Response `401`: token missing, invalid, or view_id not found.
+
+### Auth model
+
+On create, a UUID is generated as the `edit_token`. Its SHA-256 hex digest is stored in the DB. On PATCH, the token from the Authorization header is hashed and compared — the plaintext token is never stored or logged.
+
+### Shared utilities
+
+`functions/_shared/utils.js` — `sha256(text)` and `generateViewId()` (8-char alphanumeric).
 
 ---
 
