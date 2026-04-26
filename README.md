@@ -84,6 +84,11 @@ This means we hold no data that could identify who created a celebration or who 
 
 All infrastructure runs on Cloudflare's free tier.
 
+## Docs
+
+- [Build plan](docs/build-plan.md) — sequenced steps with detail on what each involves
+- [Implementation notes](docs/implementation.md) — how it actually works, updated as each part is built
+
 ## Project structure
 
 ```
@@ -95,6 +100,9 @@ assets/
   js/main.js            — global JS
   favicon.svg           — site icon
 worker/                 — Cloudflare Worker (API + routing)
+docs/
+  build-plan.md         — sequenced build steps
+  implementation.md     — running implementation notes
 ```
 
 ## Inspiration
