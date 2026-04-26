@@ -40,13 +40,21 @@ a:hover { text-decoration: underline; }
 
 .steps-nav ol {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   list-style: none;
+  margin: 0;
+  padding: 0 0.5rem;
   overflow-x: auto;
   scrollbar-width: none;
-  padding: 0 0.5rem;
 }
 
 .steps-nav ol::-webkit-scrollbar { display: none; }
+
+.steps-nav li {
+  list-style: none;
+  display: block;
+}
 
 .step {
   display: flex;
@@ -211,7 +219,20 @@ a:hover { text-decoration: underline; }
   gap: 0.6rem;
 }
 
-.scheme-opt input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.scheme-opt {
+  display: inline-block;
+  position: relative;
+}
+
+.scheme-opt input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
 
 .scheme-swatch {
   display: flex;
@@ -247,8 +268,20 @@ a:hover { text-decoration: underline; }
   gap: 0.6rem;
 }
 
-.emoji-opt { position: relative; }
-.emoji-opt input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+.emoji-opt {
+  display: inline-block;
+  position: relative;
+}
+
+.emoji-opt input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+}
 
 .emoji-opt-label {
   display: flex;
