@@ -92,13 +92,54 @@ On create, a UUID is generated as the `edit_token`. Its SHA-256 hex digest is st
 
 ### Shared utilities
 
-`functions/_shared/utils.js` — `sha256(text)` and `generateViewId()` (8-char alphanumeric).
+`sha256(text)` and `generateViewId()` are inlined in each function file. The `functions/_shared/` directory exists but is unused — cross-directory imports caused bundler resolution errors with Wrangler.
 
 ---
 
 ## Builder UI
 
-_Not yet built._
+Single scrolling page (`index.html`) with a sticky step nav at the top.
+
+### Sections
+
+| # | Section | Required fields |
+|---|---|---|
+| 1 | Occasion | One preset selected, or custom text |
+| 2 | Who | Recipient name, sender name |
+| 3 | Message | Greeting (auto-filled from occasion); personal note optional |
+| 4 | Look & Feel | Background scheme (5 presets); emoji theme (7 presets, defaults from occasion) |
+
+### Step nav behaviour
+- Highlights the section currently in view (IntersectionObserver)
+- Shows a ✓ on each step once its required fields are filled
+- Step items are anchor links — clicking scrolls to that section
+
+### Occasion selection
+- Grid of preset buttons; selecting one auto-fills the greeting and sets a matching emoji theme default
+- Custom option reveals a free-text input
+- Greeting is only auto-overwritten if it still holds a default value
+
+### Confirmation screen
+- Shown after successful `POST /api/celebrations`, replaces the builder
+- Displays share link and edit link, each with a copy-to-clipboard button
+- Edit token saved to `localStorage` keyed by `celebrate_edit_<view_id>`
+- Edit link shown with a warning about permanence
+
+### Components JSON shape (sent to API)
+```json
+{
+  "occasion": "birthday",
+  "components": {
+    "recipientName": { "value": "Cornelia" },
+    "greeting":      { "value": "Happy Birthday" },
+    "sender":        { "value": "Graham" },
+    "background":    { "scheme": "sunset" },
+    "emojiTheme":    { "set": "birthday" },
+    "personalNote":  { "value": "…" }
+  }
+}
+```
+`personalNote` is omitted if empty.
 
 ---
 

@@ -99,7 +99,8 @@ assets/
   css/styles.css        — global styles
   js/main.js            — global JS
   favicon.svg           — site icon
-worker/                 — Cloudflare Worker (API + routing)
+functions/              — Cloudflare Pages Functions (API)
+  api/celebrations/     — create, read, update endpoints
 docs/
   build-plan.md         — sequenced build steps
   implementation.md     — running implementation notes
@@ -114,7 +115,7 @@ The birthday site that preceded this project — a bespoke animated page built f
 - [x] Scaffold deployed to Cloudflare Pages
 - [x] Database schema
 - [x] Worker API (create, read, update)
-- [ ] Builder UI
+- [x] Builder UI
 - [ ] Celebration viewer
 - [ ] Photo upload (R2)
 - [ ] Edit token flow

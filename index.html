@@ -1,17 +1,168 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light dark" />
-    <title>Home</title>
+    <title>Celebrate — Create a celebration</title>
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="/assets/css/styles.css">
-    <script defer src="/assets/js/main.js"></script>
   </head>
-  <body>
-    <h1>It works 🎉</h1>
-    <p>This site is deployed using Cloudflare Pages.</p>
-    <p><a href="/about/">About</a></p>
+  <body class="builder-page">
+
+    <div id="builder-wrap">
+
+      <!-- Sticky step nav -->
+      <nav class="steps-nav" aria-label="Sections">
+        <ol>
+          <li><a class="step active" data-section="occasion" href="#occasion">
+            <span class="step-num">1</span>
+            <span class="step-label">Occasion</span>
+            <span class="step-check" aria-hidden="true">✓</span>
+          </a></li>
+          <li><a class="step" data-section="who" href="#who">
+            <span class="step-num">2</span>
+            <span class="step-label">Who</span>
+            <span class="step-check" aria-hidden="true">✓</span>
+          </a></li>
+          <li><a class="step" data-section="message" href="#message">
+            <span class="step-num">3</span>
+            <span class="step-label">Message</span>
+            <span class="step-check" aria-hidden="true">✓</span>
+          </a></li>
+          <li><a class="step" data-section="look" href="#look">
+            <span class="step-num">4</span>
+            <span class="step-label">Look &amp; Feel</span>
+            <span class="step-check" aria-hidden="true">✓</span>
+          </a></li>
+        </ol>
+      </nav>
+
+      <main>
+        <header class="builder-header">
+          <h1>Celebrate</h1>
+          <p>Create a personal celebration page for someone you care about.</p>
+        </header>
+
+        <form id="builder-form" novalidate>
+
+          <!-- 1. Occasion -->
+          <section id="occasion" class="builder-section">
+            <h2><span class="section-num">1</span> Occasion</h2>
+            <div class="occasion-grid">
+              <button type="button" class="occasion-btn" data-occasion="birthday">🎂 Birthday</button>
+              <button type="button" class="occasion-btn" data-occasion="anniversary">💍 Anniversary</button>
+              <button type="button" class="occasion-btn" data-occasion="congratulations">🏆 Congratulations</button>
+              <button type="button" class="occasion-btn" data-occasion="farewell">✈️ Farewell</button>
+              <button type="button" class="occasion-btn" data-occasion="get-well">🌸 Get Well</button>
+              <button type="button" class="occasion-btn" data-occasion="thank-you">🙏 Thank You</button>
+              <button type="button" class="occasion-btn" data-occasion="custom">✏️ Custom</button>
+            </div>
+            <div id="custom-occasion-wrap" class="field" hidden>
+              <label for="custom-occasion">What's the occasion?</label>
+              <input type="text" id="custom-occasion" placeholder="e.g. Promotion, New baby, Retirement…" maxlength="60" />
+            </div>
+          </section>
+
+          <!-- 2. Who -->
+          <section id="who" class="builder-section">
+            <h2><span class="section-num">2</span> Who</h2>
+            <div class="field">
+              <label for="recipient-name">Recipient's name <span class="req">*</span></label>
+              <input type="text" id="recipient-name" placeholder="e.g. Cornelia" maxlength="60" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="sender">From <span class="req">*</span></label>
+              <input type="text" id="sender" placeholder="e.g. Graham" maxlength="60" autocomplete="off" />
+            </div>
+          </section>
+
+          <!-- 3. Message -->
+          <section id="message" class="builder-section">
+            <h2><span class="section-num">3</span> Message</h2>
+            <div class="field">
+              <label for="greeting">Greeting <span class="req">*</span></label>
+              <input type="text" id="greeting" placeholder="e.g. Happy Birthday" maxlength="80" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="personal-note">Personal note <span class="opt">(optional)</span></label>
+              <textarea id="personal-note" rows="4" placeholder="Add a personal message…" maxlength="500"></textarea>
+            </div>
+          </section>
+
+          <!-- 4. Look & Feel -->
+          <section id="look" class="builder-section">
+            <h2><span class="section-num">4</span> Look &amp; Feel</h2>
+
+            <div class="field">
+              <label>Background</label>
+              <div class="scheme-grid">
+                <label class="scheme-opt">
+                  <input type="radio" name="background" value="sunset" checked />
+                  <span class="scheme-swatch scheme-sunset">Sunset</span>
+                </label>
+                <label class="scheme-opt">
+                  <input type="radio" name="background" value="ocean" />
+                  <span class="scheme-swatch scheme-ocean">Ocean</span>
+                </label>
+                <label class="scheme-opt">
+                  <input type="radio" name="background" value="forest" />
+                  <span class="scheme-swatch scheme-forest">Forest</span>
+                </label>
+                <label class="scheme-opt">
+                  <input type="radio" name="background" value="midnight" />
+                  <span class="scheme-swatch scheme-midnight">Midnight</span>
+                </label>
+                <label class="scheme-opt">
+                  <input type="radio" name="background" value="rose" />
+                  <span class="scheme-swatch scheme-rose">Rose</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="field">
+              <label>Emoji theme</label>
+              <div id="emoji-grid" class="emoji-grid"></div>
+            </div>
+
+            <div class="field field--disabled">
+              <label>Photo <span class="coming-soon">coming soon</span></label>
+              <input type="file" accept="image/*" disabled />
+            </div>
+          </section>
+
+          <div class="builder-actions">
+            <p id="form-error" class="form-error" hidden></p>
+            <button type="submit" id="create-btn">Create celebration</button>
+          </div>
+
+        </form>
+      </main>
+    </div>
+
+    <!-- Confirmation (replaces builder after creation) -->
+    <div id="confirmation" hidden>
+      <div class="confirm-box">
+        <h1>Your celebration is ready</h1>
+
+        <div class="confirm-link">
+          <label>Share this with <strong id="confirm-recipient"></strong></label>
+          <div class="link-row">
+            <input type="text" id="share-link" readonly />
+            <button type="button" id="copy-share">Copy</button>
+          </div>
+        </div>
+
+        <div class="confirm-link">
+          <label>Your edit link — <strong>save this now</strong></label>
+          <p class="edit-warning">This is the only way to edit your celebration. We don't store it — if you lose it, access is gone for good.</p>
+          <div class="link-row">
+            <input type="text" id="edit-link" readonly />
+            <button type="button" id="copy-edit">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/assets/js/main.js"></script>
   </body>
 </html>
