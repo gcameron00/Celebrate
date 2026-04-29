@@ -20,3 +20,6 @@ functions/og/c/resvg.wasm
 
 # Local environment variables — never commit secrets
 .dev.vars
+
+# Claude branches
+.claude/
