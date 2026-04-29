@@ -63,8 +63,26 @@ Allows the creator to include a photo in their celebration. Stored in Cloudflare
 
 ## Backlog
 
+### Rate limiting on the create endpoint
+`POST /api/celebrations` has no rate limiting and is open to abuse that could exhaust the D1 free tier. Options: KV-backed counter per IP, or Cloudflare Rate Limiting product on the route.
+
+### Input validation in the API
+No field length limits or component shape validation. Enforce `maxLength` per field and strip unknown component keys before writing to D1. See security notes in `implementation.md`.
+
+### Referrer-Policy on the builder page
+The edit token appears in the builder URL and leaks to Google Fonts via the `Referer` header. Add `Referrer-Policy: no-referrer` as a response header (or `<meta name="referrer" content="no-referrer">`) to the builder page.
+
+### Content-Security-Policy headers
+Neither the viewer nor the builder sets a CSP. Add per-page policies as a second line of defence behind the existing output escaping. Details in `implementation.md`.
+
+### Self-host fonts
+Eliminate the Google Fonts dependency (privacy, token leakage via Referer) by serving `Great Vibes` and `Cormorant Garamond` from `assets/fonts/`.
+
+### OG image cache invalidation on edit
+The rendered PNG is cached for 24 h keyed only on `view_id`. Incorporate `updated_at` or a content hash into the cache key so edits are reflected promptly.
+
 ### Delete celebration
-No mechanism to delete a celebration yet. Options: add a delete button to edit mode (requires token verification), or a scheduled cleanup of old records. Decision pending.
+No mechanism to delete a celebration. Options: add a delete button to edit mode (verified by the edit token), or a scheduled cleanup of old records. Decision pending.
 
 ### Styling and layout pass
 The builder and viewer are functional but unstyled beyond basics. A visual polish pass is needed — particularly the step nav, form spacing on mobile, and the confirmation screen.
