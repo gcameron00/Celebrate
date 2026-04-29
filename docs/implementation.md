@@ -169,8 +169,8 @@ Adapted from the birthday site. Emoji spawn from the centre and zoom outward (st
 | thank-you | 🙏 💐 ✨ 🌸 ❤️ 🌟 💛 |
 | celebration | 🎊 ✨ 🥳 🌟 🎉 🎈 ⭐ |
 
-### Security
-User content is HTML-escaped before injection. The inlined JSON is sanitised to prevent `</script>` injection.
+### Output escaping
+User content is HTML-escaped via `escapeHtml()` before injection into element content and attributes. The inlined JSON blob (`window.__C__`) is sanitised by `safeJson()` to prevent `</script>` and `<!--` injection inside the `<script>` block.
 
 ---
 
@@ -236,6 +236,54 @@ _Not yet built._
 **Viewer OG tags:**
 
 `functions/c/[view_id].js` includes absolute `og:image` and `twitter:image` URLs pointing to `/og/c/<view_id>`, with `twitter:card: summary_large_image`.
+
+---
+
+## Security
+
+### What is in place
+
+| Control | Where |
+|---|---|
+| Parameterised queries everywhere | All D1 calls use `prepare().bind()` — no string interpolation |
+| Edit token never stored in plaintext | Only the SHA-256 hex digest is written to D1; the raw UUID is returned once and forgotten |
+| HTML output escaping | `escapeHtml()` covers all user-supplied strings injected into HTML |
+| JSON script injection guard | `safeJson()` replaces `</script>` and `<!--` in the inlined `window.__C__` blob |
+| `edit_token_hash` excluded from GET response | The public read endpoint never returns the hash |
+
+---
+
+### Known gaps and concerns
+
+#### 1. No rate limiting on the create endpoint — HIGH
+`POST /api/celebrations` has no rate limiting. Repeated requests can exhaust the D1 free-tier row/storage limit and take the site down. Fix: add a KV-backed counter per IP, or enable Cloudflare Rate Limiting on the route.
+
+#### 2. No input size or shape validation — HIGH
+`occasion` and `components` are stored as-is with no length caps or key validation. A large `personalNote` (or deeply nested `components` object) is written straight to D1 and re-read on every page load. Fix: enforce `maxLength` on each field in the API before writing, and strip unknown component keys.
+
+#### 3. Edit token leaks via Referer header — MEDIUM
+The raw edit token travels in the URL (`/?id=…&edit=<token>`). The builder page loads Google Fonts from `fonts.googleapis.com`, so the browser sends a `Referer` header containing the full URL — including the token — to Google. There is no `Referrer-Policy` header to suppress this. Fix: add `<meta name="referrer" content="no-referrer">` (or a `Referrer-Policy: no-referrer` response header) to the builder page.
+
+#### 4. No Content-Security-Policy headers — MEDIUM
+Neither the viewer nor the builder sets a CSP header. The output escaping is correct today, but CSP is a critical second line of defence. A regression in escaping would be directly exploitable without it. Suggested policy for the viewer:
+```
+default-src 'none'; script-src 'self'; style-src 'self' fonts.googleapis.com; font-src fonts.gstatic.com; img-src 'self' data:
+```
+
+#### 5. OG image cache not invalidated after edits — LOW
+`functions/og/c/[view_id].js` caches the rendered PNG with `s-maxage=86400` (24 h) keyed only on `view_id`. After a PATCH the cached image won't refresh for up to a day. Fix: incorporate `updated_at` (or a content hash) into the cache key.
+
+#### 6. No delete endpoint — LOW
+There is no mechanism for a creator (or operator) to remove a celebration. Abusive content cannot be taken down without direct D1 access. See the backlog in `build-plan.md`.
+
+#### 7. Edit token stored in localStorage — LOW
+`localStorage` is readable by any script on the page. An XSS vulnerability (not currently present) would expose the token. A `httpOnly` cookie would be immune to JS access, but would require significant flow changes. Acceptable for now given there are no third-party scripts.
+
+#### 8. Third-party font loading — LOW
+Both pages load fonts from `fonts.googleapis.com` / `fonts.gstatic.com`. Visitor IPs and page URLs (including edit tokens; see point 3) are logged by Google. Self-hosting the two font files (`Great Vibes`, `Cormorant Garamond`) under `assets/fonts/` would eliminate this dependency and the associated privacy leak.
+
+#### 9. Modulo bias in view_id generation — NEGLIGIBLE
+`generateViewId()` uses `byte % 36` over a 36-character alphabet. Since 256 is not divisible by 36, the first four characters (`a`–`d`) are ~0.4 % more probable per byte. With 36⁸ ≈ 2.8 trillion possible IDs this is not practically exploitable, but a rejection-sampling approach would eliminate the bias entirely.
 
 ---
 
