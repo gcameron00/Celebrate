@@ -1,10 +1,10 @@
-# Celebrate
+# Send Cheer
 
 A platform for creating and sharing personal celebration mini-sites — crafted messages delivered as beautiful, animated web pages.
 
 ## Concept
 
-Born from a one-off birthday site built for a specific person, Celebrate generalises that idea: anyone can create a bespoke celebration page for someone they care about, share a link, and let the recipient experience something more considered than a text message or generic e-card.
+Born from a one-off birthday site built for a specific person, Send Cheer generalises that idea: anyone can create a bespoke celebration page for someone they care about, share a link, and let the recipient experience something more considered than a text message or generic e-card.
 
 A celebration is a simple, elegant web page built from a small set of customisable components. The creator picks an occasion, chooses their components, fills in the personal details, and gets a shareable URL. The recipient opens the link and sees their celebration. No app, no account, no friction.
 
@@ -47,8 +47,8 @@ Celebrations are assembled from components. The initial set is deliberately smal
 
 | URL | Purpose |
 |---|---|
-| **Share link** — `celebrate.example.com/c/abc123` | Send this to the recipient. It shows the finished celebration. |
-| **Edit link** — `celebrate.example.com/c/abc123?edit=<token>` | Keep this yourself. It unlocks editing for as long as you have it. |
+| **Share link** — `sendcheer.app/c/abc123` | Send this to the recipient. It shows the finished celebration. |
+| **Edit link** — `sendcheer.app/c/abc123?edit=<token>` | Keep this yourself. It unlocks editing for as long as you have it. |
 
 The edit link is shown prominently at creation time and saved to your browser's `localStorage` as a convenience. **If you lose the edit link and clear your browser, edit access cannot be recovered** — this is a deliberate privacy trade-off (see below).
 
@@ -62,7 +62,7 @@ The recipient opens the share link. No account, no sign-up — just the celebrat
 
 ## Privacy model
 
-Celebrate stores no personal information. There are no user accounts and no email addresses.
+Send Cheer stores no personal information. There are no user accounts and no email addresses.
 
 Access control uses a **secret token model**:
 
@@ -108,7 +108,7 @@ docs/
 
 ## Inspiration
 
-The birthday site that preceded this project — a bespoke animated page built for one person — demonstrated how much more personal a crafted web page feels compared to a card or message. Celebrate makes that same quality of experience available for any occasion, for anyone.
+The birthday site that preceded this project — a bespoke animated page built for one person — demonstrated how much more personal a crafted web page feels compared to a card or message. Send Cheer makes that same quality of experience available for any occasion, for anyone.
 
 ## Status
 

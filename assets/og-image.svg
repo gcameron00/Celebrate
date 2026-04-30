@@ -41,7 +41,7 @@
         font-family="Georgia, 'Times New Roman', serif"
         font-size="132"
         fill="white"
-        opacity="0.95">Celebrate</text>
+        opacity="0.95">Send Cheer</text>
 
   <!-- Tagline -->
   <text x="600" y="478"
@@ -52,5 +52,13 @@
         letter-spacing="1.5"
         fill="white"
         opacity="0.5">Create a personal celebration for someone worth it</text>
+
+  <!-- Domain -->
+  <text x="1160" y="614"
+        text-anchor="end"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="20"
+        fill="white"
+        opacity="0.25">sendcheer.app</text>
 
 </svg>
