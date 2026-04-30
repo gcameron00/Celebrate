@@ -75,7 +75,7 @@ function buildSvg(name, greeting, sender, scheme) {
   ${greeting ? `<text x="600" y="${greetY}" text-anchor="middle" font-family="Inter" font-size="28" fill="white" opacity="0.65" letter-spacing="7">${esc(greeting.toUpperCase())}</text>` : ''}
   <text x="600" y="${nameY}" text-anchor="middle" font-family="Great Vibes" font-size="${sz}" fill="white">${esc(name)}</text>
   ${sender ? `<text x="600" y="${senderY}" text-anchor="middle" font-family="Inter" font-size="26" fill="white" opacity="0.5">from ${esc(sender)}</text>` : ''}
-  <text x="1160" y="614" text-anchor="end" font-family="Inter" font-size="20" fill="white" opacity="0.25">Celebrate</text>
+  <text x="1160" y="614" text-anchor="end" font-family="Inter" font-size="20" fill="white" opacity="0.25">sendcheer.app</text>
 </svg>`;
 }
 
